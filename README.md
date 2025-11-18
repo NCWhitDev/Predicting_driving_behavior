@@ -7,12 +7,12 @@ Used Dataset: https://www.kaggle.com/datasets/outofskills/driving-behavior?resou
 
 Metric || Meaning || Why its useful?
 =====================================
-Accuracy || x amount of predictions || Provides an overall sense of model performance.
+<p>Accuracy || x amount of predictions || Provides an overall sense of model performance.</p>
 <br>
-Precision || out of x samples predicted as a given class || High precision means fewer false claims.
+<p>Precision || out of x samples predicted as a given class || High precision means fewer false claims.</p>
 <br>
-Recall || How many true samples did the model find || High recall means fewer missed aggressive.
+<p>Recall || How many true samples did the model find || High recall means fewer missed aggressive.</p>
 <br>
-F1-Score || Harmonic mean of precision and recall || balance false pos and false neg.
+<p>F1-Score || Harmonic mean of precision and recall || balance false pos and false neg.</p>
 <br>
-Loss || How confident the model is on predictions || Helps track training progress and detects flaws in model.
+<p>Loss || How confident the model is on predictions || Helps track training progress and detects flaws in model.</p>
