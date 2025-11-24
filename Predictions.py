@@ -42,10 +42,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 # rf = random forest
 # n_estimators = 100 to start since that is SciKit default
 # listing values used:
-# n_estimators: 100, 200, 20
+# n_estimators: 100, 200, 20, 500
 # max_depth: 20, 30
 # random_state:
-rf = RandomForestClassifier(n_estimators=500, max_features=2, random_state=7, class_weight='balanced')
+rf = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
 
 # if this prints and then everything stops you know the model froze
 print('reached training stage')
@@ -64,19 +64,18 @@ print(f"Recall: {recall:.4f}")
 print(f"F1-score: {f1:.4f}")
 # print(f"Loss: {loss:.4f}")
 
-
 print("\nPer-Class Metrics:")
 print(classification_report(y_test, y_pred))
 
 print("\nConfusion Matrix:")
 cm = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(8,6))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+sns.heatmap(cm, annot=True, fmt='d', cmap='GnBu',
             xticklabels=['AGGRESSIVE', 'NORMAL', 'SLOW'],
             yticklabels=['AGGRESIVE', 'NORMAL', 'SLOW'])
-plt.ylabel('True Label')
-plt.xlabel('Predicted Label')
+plt.ylabel('Actual Behavior Type')
+plt.xlabel('Predicted Behavior Type')
 plt.title('Consfusion Matrix')
 plt.tight_layout()
-#plt.savefig('confusion_matrix.png')
+# plt.savefig('confusion_matrix.png')
 plt.show()
