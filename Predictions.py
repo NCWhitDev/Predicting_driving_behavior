@@ -7,9 +7,14 @@
 # However the model doesn't have a memory, therefore it can't tell that a driver often accelerates and decelerates at rapid pace, only that the driver is accelerating/deccelerating
 # going to change to a neural network to have a functioning memory. Hopefully that will allow the model to keep better track of the patterns in the data
 
+# nvm neural network was too complicated so we are going back to random forest and aggregating data to see if it works
+# i think the default training data was 41% slow drivers, which was most likely imfluencing the model and causing it to misclassify drivers as slow
+# concatinating the dataset gives the model more data to randomly chose from
+
 import pandas as pd
-import numpy as np
+#import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -18,13 +23,21 @@ import seaborn as sns
 df_test_motion = pd.read_csv("test_motion_data.csv")
 df_train_motion = pd.read_csv("train_motion_data.csv")
 
+# combine data since 
+df_new = pd.concat([df_test_motion, df_test_motion])
+
 # split features & target
 # ommitted timestamp feature because who cares (definitely not the model)
-X_train = df_train_motion[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ']]
-y_train = df_train_motion['Class']
+# 11/24 brought back the Timestamp feature and it increased the accuracy to 100% so apparently the model cares
+X = df_new[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', "Timestamp"]]
+y = df_new['Class']
 
-X_test = df_test_motion[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ']]
-y_test = df_test_motion['Class']
+# X_test = df_test_motion[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ']]
+# y_test = df_test_motion['Class']
+
+# values used:
+# test_size: 0.2, 0.3, 0.999, 0.001
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=7, stratify=y)
 
 # rf = random forest
 # n_estimators = 100 to start since that is SciKit default
@@ -32,7 +45,7 @@ y_test = df_test_motion['Class']
 # n_estimators: 100, 200, 20
 # max_depth: 20, 30
 # random_state:
-rf = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
+rf = RandomForestClassifier(n_estimators=500, max_features=2, random_state=7, class_weight='balanced')
 
 # if this prints and then everything stops you know the model froze
 print('reached training stage')
