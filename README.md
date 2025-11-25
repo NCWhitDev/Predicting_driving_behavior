@@ -5,14 +5,4 @@ and for future autonomous driver coaching.
 
 Used Dataset: https://www.kaggle.com/datasets/outofskills/driving-behavior?resource=download
 
-Metric || Meaning || Why its useful?
-=====================================
-<p>Accuracy || x amount of predictions || Provides an overall sense of model performance.</p>
-<br>
-<p>Precision || out of x samples predicted as a given class || High precision means fewer false claims.</p>
-<br>
-<p>Recall || How many true samples did the model find || High recall means fewer missed aggressive.</p>
-<br>
-<p>F1-Score || Harmonic mean of precision and recall || balance false pos and false neg.</p>
-<br>
-<p>Loss || How confident the model is on predictions || Helps track training progress and detects flaws in model.</p>
+Model used: Random Forest model
