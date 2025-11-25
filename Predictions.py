@@ -12,9 +12,8 @@
 # concatinating the dataset gives the model more data to randomly chose from
 
 import pandas as pd
-#import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -23,40 +22,45 @@ import seaborn as sns
 df_test_motion = pd.read_csv("test_motion_data.csv")
 df_train_motion = pd.read_csv("train_motion_data.csv")
 
-# combine data since 
-df_new = pd.concat([df_test_motion, df_test_motion])
+# combine data sets (train + test)
+df_new = pd.concat([df_train_motion, df_test_motion], ignore_index=True)
 
-# split features & target
-# ommitted timestamp feature because who cares (definitely not the model)
-# 11/24 brought back the Timestamp feature and it increased the accuracy to 100% so apparently the model cares
+# split features & target, prepping x and y for set.
 X = df_new[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', "Timestamp"]]
 y = df_new['Class']
 
-# X_test = df_test_motion[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ']]
-# y_test = df_test_motion['Class']
 
-# values used:
-# test_size: 0.2, 0.3, 0.999, 0.001
+# TO-DO: Cross validation =======================================================================
+# Define a "base" model for CV
+rf_cv = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
+# 5-fold stratified cross-validation
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
+cv_scores = cross_val_score(rf_cv, X, y, cv=cv, scoring='accuracy')
+
+print("\nCross-Validation Results (5-fold):")
+print("Fold accuracies:", cv_scores)
+print("Mean accuracy:  {:.4f}".format(cv_scores.mean()))
+print("Std accuracy:   {:.4f}".format(cv_scores.std()))
+
+# END ============================================================================================
+
+# test_size tried: 0.2, 0.3, 0.999, 0.001
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=7, stratify=y)
 
-# rf = random forest
+# rf = Random Forest
 # n_estimators = 100 to start since that is SciKit default
-# listing values used:
 # n_estimators: 100, 200, 20, 500
-# max_depth: 20, 30
-# random_state:
+# (Not used) max_depth: 20, 30 - Max amount of times the Random Forest can split down to branches. Size of Tree.
+# random_state: controls the randomness by setting the state to be the same ever instances.
+# class_weight: Can be used to favor one feature over the other, but we want balanced features.
 rf = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
-
-# if this prints and then everything stops you know the model froze
-print('reached training stage')
 rf.fit(X_train, y_train)
-
 y_pred = rf.predict(X_test)
 
-print('prediction made... analyzing results')
-accuracy = accuracy_score(y_test, y_pred)
+print('\nprediction made... analyzing results')
+accuracy = accuracy_score(y_test, y_pred) # Compares y prediction to y test to get an accuracy percentage.
+precision, recall, f1, support = precision_recall_fscore_support(y_test, y_pred, average='weighted') # Calculates the precision/recall/fscore of the model.
 
-precision, recall, f1, _ = precision_recall_fscore_support(y_test, y_pred, average='weighted')
 print(f"\nModel Performance:")
 print(f"Accuracy: {accuracy: .4f}")
 print(f"Precision: {precision:.4f}")
@@ -64,9 +68,11 @@ print(f"Recall: {recall:.4f}")
 print(f"F1-score: {f1:.4f}")
 # print(f"Loss: {loss:.4f}")
 
+# Shows you results of each type of behavior.
 print("\nPer-Class Metrics:")
 print(classification_report(y_test, y_pred))
 
+# Visualized Graph using confusion matrix
 print("\nConfusion Matrix:")
 cm = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(8,6))
@@ -77,5 +83,4 @@ plt.ylabel('Actual Behavior Type')
 plt.xlabel('Predicted Behavior Type')
 plt.title('Consfusion Matrix')
 plt.tight_layout()
-# plt.savefig('confusion_matrix.png')
 plt.show()
