@@ -22,20 +22,33 @@ import seaborn as sns
 df_test_motion = pd.read_csv("test_motion_data.csv")
 df_train_motion = pd.read_csv("train_motion_data.csv")
 
-# combine data sets (train + test)
-df_new = pd.concat([df_train_motion, df_test_motion], ignore_index=True)
+# # combine data sets (train + test)
+# df_new = pd.concat([df_train_motion, df_test_motion], ignore_index=True)
 
+# New: Split the test data up in 4 and train off of it.
+df_test_part1 = df_test_motion[:772, :] # first 772 rows
+df_test_part2 = df_test_motion[772:1542, :] # next 770 rows
+df_test_part3 = df_test_motion[1542:2311, :] # next 770 rows
+df_test_part4 = df_test_motion[2311:, :] # Remaining rows
 # split features & target, prepping x and y for set.
-X = df_new[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', "Timestamp"]]
-y = df_new['Class']
+X1 = df_test_part1[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', "Timestamp"]]
+y1 = df_test_part1['Class']
 
+X2 = df_test_part2[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', "Timestamp"]]
+y2 = df_test_part2['Class']
+
+X3 = df_test_part3[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', "Timestamp"]]
+y3 = df_test_part3['Class']
+
+X4 = df_test_part4[['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', "Timestamp"]]
+y4 = df_test_part4['Class']
 
 # TO-DO: Cross validation =======================================================================
 # Define a "base" model for CV
-rf_cv = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
+rf = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
 # 5-fold stratified cross-validation
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
-cv_scores = cross_val_score(rf_cv, X, y, cv=cv, scoring='accuracy')
+cv_scores = cross_val_score(rf, X, y, cv=cv, scoring='accuracy')
 
 print("\nCross-Validation Results (5-fold):")
 print("Fold accuracies:", cv_scores)
@@ -53,7 +66,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 # (Not used) max_depth: 20, 30 - Max amount of times the Random Forest can split down to branches. Size of Tree.
 # random_state: controls the randomness by setting the state to be the same ever instances.
 # class_weight: Can be used to favor one feature over the other, but we want balanced features.
-rf = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
+# rf = RandomForestClassifier(n_estimators=200, max_features=2, random_state=7, class_weight='balanced')
 rf.fit(X_train, y_train)
 y_pred = rf.predict(X_test)
 
